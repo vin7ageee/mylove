@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nosso Tempo Juntos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #ff6b8b;
+            --secondary-color: #ff9eb1;
+            --light-color: #fff5f7;
+            --text-color: #555;
+            --shadow-color: rgba(255, 107, 139, 0.3);
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #fff0f5 0%, #ffeef2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: var(--text-color);
+            overflow-x: hidden;
+            position: relative;
+            transition: background 0.5s ease;
+            touch-action: manipulation;
+        }
+        
+        body.night-mode {
+            background: linear-gradient(135deg, #2c3e50 0%, #1a1a2e 100%);
+            color: #f0f0f0;
+        }
+        
+        /* Corações flutuantes - reduzidos em mobile */
+        .heart {
+            position: absolute;
+            font-size: 16px;
+            color: rgba(255, 105, 180, 0.7);
+            animation: float 8s ease-in-out infinite;
+            z-index: 0;
+            pointer-events: none;
+            text-shadow: 0 0 8px rgba(255, 105, 180, 0.5);
+        }
+        
+        @keyframes float {
+            0%, 100% { 
+                transform: translateY(0) rotate(0deg) scale(1); 
+                opacity: 0.8;
+            }
+            50% { 
+                transform: translateY(-80px) rotate(20deg) scale(1.1); 
+                opacity: 1;
+            }
+        }
+        
+        /* Container principal - ajuste mobile */
+        .main-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+            max-width: 100%;
+            position: relative;
+            z-index: 1;
+            padding: 15px;
+            perspective: none;
+        }
+        
+        /* Contador - redesign para mobile */
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 25px 15px;
+            box-shadow: 0 10px 25px var(--shadow-color);
+            width: 95%;
+            max-width: 100%;
+            border: 1px solid var(--light-color);
+            backdrop-filter: blur(3px);
+            transform-style: preserve-3d;
+            position: relative;
+            overflow: hidden;
+            margin: 10px;
+        }
+        
+        body.night-mode .container {
+            background: rgba(30, 30, 40, 0.95);
+            border-color: #444;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 26px;
+            font-weight: 600;
+            font-family: 'Dancing Script', cursive;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        
+        .subtitle {
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            font-size: 14px;
+            font-style: italic;
+        }
+        
+        /* Grid do contador - 2 colunas em mobile */
+        .counter-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        
+        .counter-item {
+            background: var(--light-color);
+            border-radius: 12px;
+            padding: 15px 10px;
+            box-shadow: 0 4px 10px rgba(255, 107, 139, 0.15);
+            border: 1px solid #ffebee;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        body.night-mode .counter-item {
+            background: rgba(50, 50, 60, 0.7);
+            border-color: #555;
+        }
+        
+        .counter-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px var(--shadow-color);
+        }
+        
+        .counter-item::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            opacity: 0.7;
+            transition: all 0.2s;
+        }
+        
+        .counter-item:hover::after {
+            height: 3px;
+            opacity: 1;
+        }
+        
+        .counter-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 8px 0;
+            text-shadow: 0 1px 3px rgba(255, 107, 139, 0.2);
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .counter-label {
+            font-size: 12px;
+            color: var(--secondary-color);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-weight: 300;
+        }
+        
+        .total-container {
+            margin-top: 20px;
+            font-size: 16px;
+            height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .total-item {
+            position: absolute;
+            width: 100%;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        .total-item.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .highlight {
+            font-weight: bold;
+            color: var(--primary-color);
+            font-size: 18px;
+        }
+        
+        /* Polaroids - escondidos em mobile */
+        .polaroid {
+            display: none;
+        }
+        
+        /* Botão de modo noturno - maior em mobile */
+        .mode-toggle {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            background: var(--light-color);
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .mode-toggle:active {
+            transform: scale(0.95);
+        }
+        
+        .mode-toggle i {
+            font-size: 20px;
+            color: var(--primary-color);
+        }
+        
+        /* Mensagens flutuantes - simplificadas em mobile */
+        .message-bubble {
+            position: absolute;
+            background: white;
+            padding: 8px 12px;
+            border-radius: 15px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.3s;
+            z-index: 5;
+            max-width: 160px;
+            font-size: 12px;
+            text-align: center;
+        }
+        
+        .message-bubble.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        /* Media Queries para tablets */
+        @media (min-width: 481px) and (max-width: 768px) {
+            .container {
+                width: 90%;
+                padding: 30px 20px;
+            }
+            
+            .counter-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .counter-value {
+                font-size: 28px;
+            }
+            
+            .counter-label {
+                font-size: 14px;
+            }
+            
+            h1 {
+                font-size: 30px;
+            }
+            
+            .subtitle {
+                font-size: 16px;
+            }
+        }
+        
+        /* Media Queries para desktop - mantém o layout original */
+        @media (min-width: 769px) {
+            .main-container {
+                max-width: 1100px;
+                padding: 40px;
+                gap: 30px;
+            }
+            
+            .container {
+                width: 550px;
+                padding: 50px;
+            }
+            
+            .counter-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 20px;
+            }
+            
+            .counter-value {
+                font-size: 36px;
+            }
+            
+            .counter-label {
+                font-size: 16px;
+            }
+            
+            h1 {
+                font-size: 32px;
+            }
+            
+            .subtitle {
+                font-size: 18px;
+                margin-bottom: 40px;
+            }
+            
+            .polaroid {
+                display: block;
+                background: white;
+                padding: 15px 15px 30px 15px;
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+                transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+                width: 180px;
+                position: absolute;
+                z-index: 2;
+                transform-origin: center;
+                filter: brightness(0.95);
+            }
+            
+            .polaroid:nth-child(1) {
+                top: -60px;
+                left: -70px;
+                transform: rotate(-12deg);
+            }
+            
+            .polaroid:nth-child(2) {
+                top: -40px;
+                right: -60px;
+                transform: rotate(8deg);
+            }
+            
+            .polaroid:nth-child(3) {
+                bottom: -50px;
+                left: -80px;
+                transform: rotate(-8deg);
+            }
+            
+            .polaroid:nth-child(4) {
+                bottom: -40px;
+                right: -70px;
+                transform: rotate(12deg);
+            }
+            
+            .polaroid:hover {
+                transform: rotate(0deg) scale(1.15);
+                box-shadow: 0 12px 30px var(--shadow-color);
+                z-index: 10;
+                filter: brightness(1.05);
+            }
+            
+            .polaroid img {
+                width: 100%;
+                height: 150px;
+                object-fit: cover;
+                border: 1px solid #ffebee;
+                transition: all 0.3s;
+            }
+            
+            .polaroid:hover img {
+                transform: scale(1.02);
+            }
+            
+            .polaroid-caption {
+                text-align: center;
+                font-family: 'Dancing Script', cursive;
+                color: var(--primary-color);
+                margin-top: 15px;
+                font-size: 18px;
+                transition: all 0.3s;
+            }
+            
+            .polaroid:hover .polaroid-caption {
+                transform: scale(1.05);
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Botão de modo noturno -->
+    <button class="mode-toggle" id="modeToggle">
+        <i class="fas fa-moon"></i>
+    </button>
+    
+    <!-- Corações flutuantes -->
+    <div id="hearts-container"></div>
+    
+    <!-- Mensagens flutuantes -->
+    <div id="messages-container"></div>
+
+    <div class="main-container">
+        <!-- Polaroids ao redor (visíveis apenas em desktop) -->
+        <div class="polaroid">
+            <img src="foto 1.jpg" alt="Foto 1">
+            <div class="polaroid-caption">Nosso início</div>
+        </div>
+        <div class="polaroid">
+            <img src="foto 2.jpg" alt="Foto 2">
+            <div class="polaroid-caption">Momento único</div>
+        </div>
+        <div class="polaroid">
+            <img src="foto 3.jpg" alt="Foto 3">
+            <div class="polaroid-caption">Aventuras</div>
+        </div>
+        <div class="polaroid">
+            <img src="foto 4.jpg" alt="Foto 4">
+            <div class="polaroid-caption">Promessas</div>
+        </div>
+
+        <!-- Contador central -->
+        <div class="container">
+            <h1>Nosso Tempo Juntos</h1>
+            <p class="subtitle">Cada segundo ao seu lado é um momento especial 💖</p>
+            
+            <div class="counter-grid">
+                <div class="counter-item">
+                    <div id="anos" class="counter-value">0</div>
+                    <div class="counter-label">ANOS</div>
+                </div>
+                <div class="counter-item">
+                    <div id="meses" class="counter-value">0</div>
+                    <div class="counter-label">MESES</div>
+                </div>
+                <div class="counter-item">
+                    <div id="dias" class="counter-value">0</div>
+                    <div class="counter-label">DIAS</div>
+                </div>
+                <div class="counter-item">
+                    <div id="horas" class="counter-value">0</div>
+                    <div class="counter-label">HORAS</div>
+                </div>
+                <div class="counter-item">
+                    <div id="minutos" class="counter-value">0</div>
+                    <div class="counter-label">MINUTOS</div>
+                </div>
+                <div class="counter-item">
+                    <div id="segundos" class="counter-value">0</div>
+                    <div class="counter-label">SEGUNDOS</div>
+                </div>
+            </div>
+            
+            <div class="total-container">
+                <div id="total-dias" class="total-item">
+                    <span class="highlight">0</span> dias de felicidade
+                </div>
+                <div id="total-minutos" class="total-item">
+                    <span class="highlight">0</span> minutos de cumplicidade
+                </div>
+                <div id="total-segundos" class="total-item">
+                    <span class="highlight">0</span> segundos de amor
+                </div>
+                <div id="memory-message" class="total-item">
+                    <span id="memory-text">Carregando memórias...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== DETECÇÃO DE DISPOSITIVO MÓVEL ===== //
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        // ===== CORAÇÕES FLUTUANTES - REDUZIDOS EM MOBILE ===== //
+        const heartsContainer = document.getElementById("hearts-container");
+        function createHearts() {
+            const heartCount = isMobile ? 10 : 20;
+            const heartSize = isMobile ? 16 : 24;
+            
+            for (let i = 0; i < heartCount; i++) {
+                const heart = document.createElement("div");
+                heart.classList.add("heart");
+                heart.innerHTML = "❤";
+                heart.style.left = Math.random() * 100 + "vw";
+                heart.style.top = Math.random() * 100 + "vh";
+                heart.style.animationDuration = (6 + Math.random() * 6) + "s";
+                heart.style.animationDelay = Math.random() * 5 + "s";
+                heart.style.fontSize = (heartSize - 4 + Math.random() * 8) + "px";
+                heartsContainer.appendChild(heart);
+            }
+        }
+        createHearts();
+
+        // ===== MODO NOTURNO ===== //
+        const modeToggle = document.getElementById("modeToggle");
+        const body = document.body;
+        
+        // Verifica preferência do usuário
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            body.classList.add("night-mode");
+            modeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        }
+        
+        modeToggle.addEventListener("click", () => {
+            body.classList.toggle("night-mode");
+            if (body.classList.contains("night-mode")) {
+                modeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                localStorage.setItem("theme", "dark");
+            } else {
+                modeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                localStorage.setItem("theme", "light");
+            }
+        });
+        
+        // Verifica localStorage ao carregar
+        if (localStorage.getItem("theme") === "dark") {
+            body.classList.add("night-mode");
+            modeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        }
+
+        // ===== CONTADOR DE TEMPO - OTIMIZADO PARA MOBILE ===== //
+        let dataInicial = new Date(2023, 5, 26); // 26/06/2023
+        let lastUpdate = 0;
+        const updateInterval = isMobile ? 2000 : 1000; // Atualiza a cada 2s em mobile para economizar bateria
+        
+        // Elementos totais para alternância
+        const totalItems = [
+            document.getElementById("total-dias"),
+            document.getElementById("total-minutos"),
+            document.getElementById("total-segundos"),
+            document.getElementById("memory-message")
+        ];
+        
+        const memoryMessages = [
+            "Lembra do nosso primeiro encontro?",
+            "Cada dia ao seu lado é um presente",
+            "Você torna cada momento especial",
+            "Nosso amor cresce a cada segundo",
+            "Já vivemos tantas histórias juntos",
+            "O tempo voa quando estou com você",
+            "Cada risada nossa é um tesouro",
+            "Nossas aventuras são inesquecíveis",
+            "Prometo te amar por toda a eternidade",
+            "Você é meu maior presente"
+        ];
+        
+        let currentTotalIndex = 0;
+        totalItems[currentTotalIndex].classList.add("active");
+        
+        // Alternância automática mais lenta em mobile
+        const rotationInterval = isMobile ? 5000 : 4000;
+        setInterval(() => {
+            totalItems[currentTotalIndex].classList.remove("active");
+            currentTotalIndex = (currentTotalIndex + 1) % totalItems.length;
+            
+            // Se for o item de memória, atualiza o texto
+            if (currentTotalIndex === 3) {
+                document.getElementById("memory-text").textContent = 
+                    memoryMessages[Math.floor(Math.random() * memoryMessages.length)];
+            }
+            
+            totalItems[currentTotalIndex].classList.add("active");
+        }, rotationInterval);
+
+        // ===== MENSAGENS FLUTUANTES - SIMPLIFICADAS EM MOBILE ===== //
+        function showFloatingMessage(text, type = "info") {
+            if (isMobile && Math.random() > 0.7) return; // Mostra menos mensagens em mobile
+            
+            const messagesContainer = document.getElementById("messages-container");
+            const message = document.createElement("div");
+            message.classList.add("message-bubble");
+            message.textContent = text;
+            
+            // Posiciona melhor para mobile
+            if (isMobile) {
+                message.style.left = "50%";
+                message.style.transform = "translateX(-50%) scale(0)";
+                message.style.bottom = "20%";
+            } else {
+                message.style.left = Math.random() * 60 + 20 + "%";
+                message.style.top = Math.random() * 60 + 20 + "%";
+            }
+            
+            // Estilo baseado no tipo
+            if (type === "success") {
+                message.style.background = "linear-gradient(135deg, #a1ffce 0%, #faffd1 100%)";
+                message.style.color = "#2c3e50";
+            } else {
+                message.style.background = "white";
+            }
+            
+            messagesContainer.appendChild(message);
+            
+            // Mostra a mensagem
+            setTimeout(() => {
+                message.classList.add("show");
+                if (isMobile) {
+                    message.style.transform = "translateX(-50%) scale(1)";
+                }
+            }, 10);
+            
+            // Remove após alguns segundos
+            setTimeout(() => {
+                message.classList.remove("show");
+                setTimeout(() => {
+                    message.remove();
+                }, 300);
+            }, 2500);
+        }
+
+        // ===== CONTADOR PRECISO - OTIMIZADO PARA MOBILE ===== //
+        function atualizarContador() {
+            const agora = new Date();
+            const diferenca = agora - dataInicial;
+            
+            // Otimização: só atualiza se passou tempo suficiente
+            const now = Date.now();
+            if (now - lastUpdate < updateInterval) return;
+            lastUpdate = now;
+            
+            // Cálculo preciso de anos, meses e dias
+            let anos = agora.getFullYear() - dataInicial.getFullYear();
+            let meses = agora.getMonth() - dataInicial.getMonth();
+            let dias = agora.getDate() - dataInicial.getDate();
+            
+            // Ajuste para dias negativos
+            if (dias < 0) {
+                meses--;
+                // Dias no mês anterior
+                const ultimoDiaMesAnterior = new Date(
+                    agora.getFullYear(), 
+                    agora.getMonth(), 
+                    0
+                ).getDate();
+                dias += ultimoDiaMesAnterior;
+            }
+            
+            // Ajuste para meses negativos
+            if (meses < 0) {
+                anos--;
+                meses += 12;
+            }
+            
+            // Horas, minutos e segundos
+            const segundosTotais = Math.floor(diferenca / 1000);
+            const segundos = segundosTotais % 60;
+            const minutosTotais = Math.floor(segundosTotais / 60);
+            const minutos = minutosTotais % 60;
+            const horasTotais = Math.floor(minutosTotais / 60);
+            const horas = horasTotais % 24;
+            const diasTotais = Math.floor(horasTotais / 24);
+            
+            // Atualiza a interface
+            document.getElementById("anos").textContent = anos;
+            document.getElementById("meses").textContent = meses;
+            document.getElementById("dias").textContent = dias;
+            document.getElementById("horas").textContent = String(horas).padStart(2, '0');
+            document.getElementById("minutos").textContent = String(minutos).padStart(2, '0');
+            document.getElementById("segundos").textContent = String(segundos).padStart(2, '0');
+            
+            // Totais formatados
+            totalItems[0].querySelector(".highlight").textContent = diasTotais.toLocaleString('pt-BR');
+            totalItems[1].querySelector(".highlight").textContent = minutosTotais.toLocaleString('pt-BR');
+            totalItems[2].querySelector(".highlight").textContent = segundosTotais.toLocaleString('pt-BR');
+        }
+        
+        // Inicia e atualiza em intervalos otimizados
+        atualizarContador();
+        setInterval(atualizarContador, updateInterval);
+        
+        // ===== EFEITO PARALLAX - DESATIVADO EM MOBILE ===== //
+        if (!isMobile) {
+            document.addEventListener("mousemove", (e) => {
+                const container = document.querySelector(".container");
+                const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+                const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+                container.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+            });
+            
+            document.querySelector(".container").addEventListener("mouseleave", () => {
+                document.querySelector(".container").style.transform = "rotateY(0deg) rotateX(0deg)";
+            });
+        }
+        
+        // ===== TOUCH EVENTS PARA FEEDBACK TÁTIL ===== //
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('touchstart', () => {
+                button.classList.add('active');
+            });
+            
+            button.addEventListener('touchend', () => {
+                setTimeout(() => button.classList.remove('active'), 200);
+            });
+        });
+        
+        // Previne zoom indesejado com double-tap
+        document.addEventListener('dblclick', (e) => {
+            e.preventDefault();
+        }, { passive: false });
+        
+        // ===== PRÉ-CARREGAMENTO DE IMAGENS - PRIORIZA CONTEÚDO VISÍVEL ===== //
+        function preloadImages() {
+            if (isMobile) return; // Não pré-carrega em mobile para economizar dados
+            
+            const imageUrls = [
+                "https://source.unsplash.com/random/300x300/?couple,romantic,1",
+                "https://source.unsplash.com/random/300x300/?love,kiss,1",
+                "https://source.unsplash.com/random/300x300/?sunset,beach,1",
+                "https://source.unsplash.com/random/300x300/?wedding,ring,1"
+            ];
+            
+            imageUrls.forEach(url => {
+                const img = new Image();
+                img.src = url;
+            });
+        }
+        
+        window.addEventListener("load", preloadImages);
+    </script>
+</body>
+</html>
